@@ -1,12 +1,28 @@
 import React, { lazy, Suspense } from 'react'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
-import './App.css';
+import * as ROUTES from './constants/routes'
+const Dashboard = lazy(() => import('./pages/dashboard'));
+const Login = lazy(() => import('./pages/login'));
+const NotFound = lazy(() => import('./pages/notFound'));
+const Profile = lazy(() => import('./pages/profile'));
+const SignUp = lazy(() => import('./pages/signup'));
+
+
 
 function App() {
   return (
-    <div className="App">
-      <h1 className="text-blue-500">Hello World</h1>
-    </div>
+    <Router>
+      <Suspense fallback={<p>Loading...</p>}>
+        <Switch>
+          <Route path={ROUTES.LOGIN} component={Login} />
+          <Route path={ROUTES.NOT_FOUND} component={NotFound} />
+          <Route path={ROUTES.PROFILE} component={Profile} />
+          <Route path={ROUTES.SIGN_UP} component={SignUp} />
+          <Route path={ROUTES.DASHBOARD} component={Dashboard} exact />
+        </Switch>
+      </Suspense>
+    </Router>
   );
 }
 
