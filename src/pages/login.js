@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { Link } from "react-router-dom"
+import { Link, useHistory } from "react-router-dom"
 import FirebaseContext from '../context/FirebaseContext'
 
 import * as ROUTES from '../constants/routes'
@@ -8,6 +8,7 @@ import logo from '../images/iglogo.jpg'
 
 
 const Login = () => {
+    const history = useHistory()
     const [emailAddress, setEmailAddress] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
@@ -22,6 +23,7 @@ const Login = () => {
 
         try {
             await firebase.auth().signInWithEmailAndPassword(emailAddress, password)
+            history.push(ROUTES.DASHBOARD)
         } catch (error) {
             console.log(error.message)
             setEmailAddress('')
