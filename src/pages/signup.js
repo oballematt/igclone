@@ -4,6 +4,7 @@ import { Link, useHistory } from 'react-router-dom'
 import iglogo from '../images/iglogo.jpg'
 import * as ROUTES from '../constants/routes'
 import FirebaseContext from '../context/FirebaseContext'
+import { doesUsernameExist } from '../services/firebase'
 
 const Signup = () => {
 
@@ -22,15 +23,41 @@ const Signup = () => {
     const handleSignUp = async (e) => {
         e.preventDefault()
 
-        try {
-            await firebase.auth().createUserWithEmailAndPassword(emailAddress, password)
-            history.push(ROUTES.DASHBOARD)
-        } catch (error) {
+        const usernameExists = await doesUsernameExist(userName)
+
+        if(!usernameExists.length) {
+            try {
+                const newUser =  await firebase.auth().createUserWithEmailAndPassword(emailAddress, password)
+      
+                await newUser.user.updateProfile({
+                    displayName: userName
+                });
+      
+                await firebase.firestore().collection('users').add ({
+                    userId: newUser.user.uid,
+                    username: userName.toLowerCase(),
+                    fullName: fullName,
+                    emailAddress: emailAddress.toLowerCase(),
+                    following: [],
+                    followers: [],
+                    dateCreated: Date.now()
+                })
+                  history.push(ROUTES.DASHBOARD)
+              } catch (error) {
+                  setEmailAddress('')
+                  setPassword('')
+                  setFullName('')
+                  setUserName('')
+                  setError(error.message)
+              }
+          } else {
             setEmailAddress('')
             setPassword('')
-            setError(error.message)
+            setFullName('')
+            setUserName('')
+            setError('Thas username already exists')
+          }
         }
-    }
 
     const isInvalid = userName === '' || fullName === '' || emailAddress === '' || password === ''
 
